@@ -4,13 +4,40 @@ namespace Core
 {
     public class AvailableOperations
     {
+        public List<string> AriphmeticOperations = new List<string>() { "+", "-", "*", "/" };
 
-        public static readonly List<string> AlgebraicOperations = new()
+        public Dictionary<string, int> OperationWeights = new()
         {
-            "+", "-", "*", "/"
+            { "*", 4 },
+            { "/", 3 },
+            { "+", 2 },
+            { "-", 1 }
         };
 
-        public static List<string> GetAllowedLetters() 
+        public Dictionary<string, List<string>> GetUnallowedSymbolsDict()
+        {
+            var unallowedSymbolsDict = new Dictionary<string, List<string>>()
+            {
+                { "+", new List<string>() { "-", "+", "*", "/" } },
+                { "-", new List<string>() { "-", "+", "*", "/" } },
+                { "*", new List<string>() { "-", "+", "*", "/" } },
+                { "/", new List<string>() { "-", "+", "*", "/" } },
+                { ")", new List<string>() { "(" } },
+                { "(", new List<string>() { "+", "*", "/", ")" } },
+                {".", new List<string>() { "-", "+", "*", "/", ")", "(" }}
+            };
+
+            var allowedLetters = GetAllowedLetters();
+            foreach (var allowedLetter in allowedLetters)
+            {
+                unallowedSymbolsDict.Add(allowedLetter, allowedLetters);
+            }
+
+            unallowedSymbolsDict["."].AddRange(allowedLetters);
+
+            return unallowedSymbolsDict;
+        }
+        public List<string> GetAllowedLetters() 
         {
             var list = new List<string>();
             for (var c = 'A'; c <= 'Z'; ++c) {

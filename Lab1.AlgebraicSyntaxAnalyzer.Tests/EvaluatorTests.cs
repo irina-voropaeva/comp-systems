@@ -19,7 +19,7 @@ namespace Lab1.AlgebraicSyntaxAnalyzer.Tests
         [Test]
         public void Test()
         {
-            var expression = "a+b/12)*(-4)";
+            var expression = "*ab+/1.2)(-4(/";
 
             var result = _expressionEvaluator.Parse(expression);
 
