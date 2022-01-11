@@ -1,6 +1,7 @@
 ﻿using System;
+using Lab2.Tree.Helpers;
 
-namespace Lab2.Tree.Tree
+namespace Lab2.Tree
 {
     public class Program
     {
@@ -12,15 +13,23 @@ namespace Lab2.Tree.Tree
             {
                 var expression = "a+b*c/d-i+5*g*(o+p)";
 
-                var tokenized = new Tokenizer(expression).TokenizeExpression();
+                var tokenizer = new Tokenizer(expression);
 
-                    tokenized.ForEach(token => Console.WriteLine(
-                        $"Token: [{token.value}] Type: [{token.type}] Priority: [{token.priority}]"));
+                var tokenized = tokenizer.CreateTokensList();
 
-                var groups = new GroupsConstructor(tokenized).ConstructFromTokens();
-                var root = new Tree.TreeBuilder(groups).Build();
+                Console.WriteLine(expression);
+                Console.WriteLine("Operations priority");
 
-                PrintMessage("Visualizing tree...", ConsoleColor.Yellow);
+                foreach (var token in tokenized)
+                {
+                    Console.WriteLine($"Value: {token.Value} is {token.Type}; priority: {token.Priority}");
+                }
+
+                var singleOperationCallBuilder = new SingleOperationCallBuilder(tokenized);
+                var singleOperationCallDtos = singleOperationCallBuilder.BuildFromTokens();
+
+                var root = new NodeBuilder(singleOperationCallDtos).Build();
+
                 TreePrinter.Print(root);
 
                 Console.WriteLine(" ");

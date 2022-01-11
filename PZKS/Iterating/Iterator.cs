@@ -1,45 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Core
+namespace Core.Iterating 
 {
-
-    public enum IterationOptions
-    {
-        ToCollectionEnd,
-        KeepIterating
-    }
-
-    public enum Direction
-    {
-        Forward,
-        Backward
-    }
 
     public class Iterator<TIterable>
     {
-        public Iterator(List<TIterable> collection, IterationOptions option)
-            : this(collection) => iterationOption = option;
+        public Iterator(List<TIterable> list, IterationOptions option)
+            : this(list) => iterationOption = option;
 
-        public Iterator(List<TIterable> collection)
+        public Iterator(List<TIterable> list)
         {
-            this.collection = collection;
+            this._list = list;
             CurrentIndex = 0;
             Iteration = 1;
-            CurrentElement = collection[CurrentIndex];
-            NextElement = collection[CurrentIndex + 1];
+            CurrentElement = list[CurrentIndex];
+            NextElement = list[CurrentIndex + 1];
             iterationOption = IterationOptions.ToCollectionEnd;
         }
 
         public bool MoveNext => CurrentIndex < CollectionLength;
         public bool CollectionEnd => CurrentIndex == CollectionLength;
-        public int CollectionLength => collection.Count - 1;
+        public int CollectionLength => _list.Count - 1;
         public TIterable CurrentElement { get; private set; }
         public TIterable NextElement { get; private set; }
         public int CurrentIndex { get; private set; }
         public int Iteration { get; private set; }
 
-        private readonly List<TIterable> collection;
+        private readonly List<TIterable> _list;
         private readonly IterationOptions iterationOption;
 
         public void MoveForward()
@@ -47,9 +35,9 @@ namespace Core
             if (MoveNext)
             {
                 CurrentIndex++;
-                CurrentElement = collection[CurrentIndex];
+                CurrentElement = _list[CurrentIndex];
 
-                if (!CollectionEnd) NextElement = collection[CurrentIndex + 1];
+                if (!CollectionEnd) NextElement = _list[CurrentIndex + 1];
                 else NextElement = default;
             }
             else
@@ -69,7 +57,7 @@ namespace Core
             {
                 CurrentIndex--;
                 NextElement = CurrentElement;
-                CurrentElement = collection[CurrentIndex];
+                CurrentElement = _list[CurrentIndex];
             }
         }
 
@@ -78,8 +66,8 @@ namespace Core
             if (position < 0 || position > CollectionLength) return;
 
             CurrentIndex = position;
-            CurrentElement = collection[position];
-            NextElement = collection[position + 1];
+            CurrentElement = _list[position];
+            NextElement = _list[position + 1];
         }
 
         public TIterable LookAt(int position, Direction direction)
@@ -87,7 +75,7 @@ namespace Core
             var lookAtPosition = direction is Direction.Forward ? CurrentIndex + position : CurrentIndex - position;
 
             return lookAtPosition < CollectionLength + 1 && lookAtPosition >= 0
-                ? collection[lookAtPosition]
+                ? _list[lookAtPosition]
                 : default;
         }
 
@@ -95,7 +83,7 @@ namespace Core
         {
             try
             {
-                change(collection);
+                change(_list);
                 ChangeCurrentIndex();
             }
             catch (Exception)
@@ -106,12 +94,12 @@ namespace Core
 
         private void ChangeCurrentIndex()
         {
-            var currentExist = collection.Contains(CurrentElement);
+            var currentExist = _list.Contains(CurrentElement);
 
             if (currentExist)
             {
-                CurrentIndex = collection.IndexOf(CurrentElement);
-                NextElement = CollectionEnd ? default : collection[CurrentIndex + 1];
+                CurrentIndex = _list.IndexOf(CurrentElement);
+                NextElement = CollectionEnd ? default : _list[CurrentIndex + 1];
             }
             else ResetIndex();
         }
@@ -121,8 +109,8 @@ namespace Core
             CurrentIndex = 0;
             var hasElements = CollectionLength > 0;
 
-            CurrentElement = hasElements ? collection[CurrentIndex] : default;
-            NextElement = hasElements ? collection[CurrentIndex + 1] : default;
+            CurrentElement = hasElements ? _list[CurrentIndex] : default;
+            NextElement = hasElements ? _list[CurrentIndex + 1] : default;
         }
     }
 }

@@ -1,39 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lab2.Tree.Tree;
 
-namespace Lab2.Tree.Tree
+namespace Lab2.Tree.Helpers
 {
     public static class TreePrinter
     {
-        class NodeInfo
+        public static void Print(this Node root)
         {
-            public Node Node;
-            public string Text;
-            public int StartPos;
-
-            public int Size
+            if (root == null)
             {
-                get { return Text.Length; }
+                return;
             }
 
-            public int EndPos
-            {
-                get { return StartPos + Size; }
-                set { StartPos = value - Size; }
-            }
+            const int topMargin = 3;
+            const int leftMargin = 3;
 
-            public NodeInfo Parent, Left, Right;
-        }
 
-        public static void Print(this Node root, int topMargin = 2, int leftMargin = 2)
-        {
-            if (root == null) return;
-            int rootTop = Console.CursorTop + topMargin;
+            var rootTop = Console.CursorTop + topMargin;
             var last = new List<NodeInfo>();
             var next = root;
             for (int level = 0; next != null; level++)
             {
-                var item = new NodeInfo { Node = next, Text = next.Token.value };
+                var item = new NodeInfo { Node = next, Text = next.Token.Value };
                 if (level < last.Count)
                 {
                     item.StartPos = last[level].EndPos + 1;
@@ -85,9 +74,7 @@ namespace Lab2.Tree.Tree
 
         private static void Print(NodeInfo item, int top)
         {
-            SwapColors();
             Print(item.Text, top, item.StartPos);
-            SwapColors();
             if (item.Left != null)
                 PrintLink(top + 1, "┌", "┘", item.Left.StartPos + item.Left.Size / 2, item.StartPos);
             if (item.Right != null)
@@ -106,13 +93,6 @@ namespace Lab2.Tree.Tree
             Console.SetCursorPosition(left, top);
             if (right < 0) right = left + s.Length;
             while (Console.CursorLeft < right) Console.Write(s);
-        }
-
-        private static void SwapColors()
-        {
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = Console.BackgroundColor;
-            Console.BackgroundColor = color;
         }
     }
 }

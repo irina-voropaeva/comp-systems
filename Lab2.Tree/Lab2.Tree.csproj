@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="p\**" />
+    <EmbeddedResource Remove="p\**" />
+    <None Remove="p\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PZKS\Core.csproj" />
   </ItemGroup>
 
