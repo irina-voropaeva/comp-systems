@@ -54,7 +54,7 @@ namespace Lab1.AlgebraicSyntaxAnalyzer.Evaluator
             errors.AddRange(duplicatesErrors);
 
             var unallowedSymbolsErrors = CheckSequenceOfSymbols(
-                AvailableOperations.GetUnallowedSymbolsDict(),
+                (new AvailableOperations()).GetUnallowedSymbolsDict(),
                 expression, 
                 ErrorMessages.UnallowedSymbolsSequence);
 

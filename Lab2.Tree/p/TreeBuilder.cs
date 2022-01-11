@@ -269,9 +269,9 @@ namespace Lab2.Tree
         //    depth, ix = sorted(pairs)[0]
         //    return depth, ix
 
-        public Tuple<int, int> GetMaxOperations(List<Token> seq)
-        {
-            var 
-        }
+        //public Tuple<int, int> GetMaxOperations(List<Token> seq)
+        //{
+        //    var 
+        //}
     }
 }

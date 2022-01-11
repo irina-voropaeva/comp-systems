@@ -6,13 +6,16 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "PZKS\Core.csproj", "{D20BC6DF-8A6B-4C43-940C-8FF726820651}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab1.AlgebraicSyntaxAnalyzer", "Lab1.AlgebraicSyntaxAnalyzer\Lab1.AlgebraicSyntaxAnalyzer.csproj", "{3368FCCF-6BB3-4BFB-AC32-AB46E9835EDF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{177E9ADA-9F4B-451A-9893-87AAC59942AE} = {177E9ADA-9F4B-451A-9893-87AAC59942AE}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab1.AlgebraicSyntaxAnalyzer.Tests", "Lab1.AlgebraicSyntaxAnalyzer.Tests\Lab1.AlgebraicSyntaxAnalyzer.Tests.csproj", "{90F3CED5-1056-4B9B-ACA9-9995E40EFB55}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3368FCCF-6BB3-4BFB-AC32-AB46E9835EDF} = {3368FCCF-6BB3-4BFB-AC32-AB46E9835EDF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab2.Tree", "Lab2.Tree\Lab2.Tree.csproj", "{177E9ADA-9F4B-451A-9893-87AAC59942AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab2.Tree", "Lab2.Tree\Lab2.Tree.csproj", "{177E9ADA-9F4B-451A-9893-87AAC59942AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
