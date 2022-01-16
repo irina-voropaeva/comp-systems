@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Iterating;
 using Lab2.Tree.Tokens;
 
@@ -12,8 +13,10 @@ namespace Lab2.Tree
             _groups = new List<SingleOperationCallDto>();
         }
 
-        private readonly Iterator<Token> _iterator;
+        private Iterator<Token> _iterator;
         private readonly List<SingleOperationCallDto> _groups;
+        private SingleOperationCallDto _previous = null;
+        private Iterator<Token> _previousCandidate = null;
 
         private readonly List<TokenType> _groupableTokens = new()
         {
@@ -24,23 +27,65 @@ namespace Lab2.Tree
 
         public List<SingleOperationCallDto> BuildFromTokens()
         {
-            while (!IsLast())
+            while (!IsLast()) //[1] = [0]/d; add([1]-i)
             {
-                if (IsValidForProcess())
+                if (IsValidForProcess() || (IsOperation(_iterator.CurrentElement) && _previous?.Operation.Priority >= _iterator.CurrentElement.Priority))
                 {
-                    var processed = ProcessSingleOperationCall();
-                    if (!processed)
+                    if ((IsOperation(_iterator.CurrentElement) && _previous?.Operation.Priority >= _iterator.CurrentElement.Priority))
                     {
-                        _iterator.MoveForward();
+                        var startIndex = _iterator.CurrentIndex;
+                        var callLength = 2;
+
+                        var singleCallList = new List<Token>
+                        {
+                           new Token(_previous.Name, TokenType.SingleOperationCall, 0)
+                        };
+
+                        for (var i = 0; i < callLength; i++)
+                        {
+                            singleCallList.Add(_iterator.CurrentElement);
+                            _iterator.MoveForward();
+                        }
+
+                        var result = CreateSingleOperationCall(startIndex, singleCallList, callLength);
+
+
+                        if (result)
+                        {
+                            _iterator.ChangeCollection(tokens => tokens.RemoveRange(_previous.BeginIndex - 1, 1));
+                        }
+                        else
+                        {
+                            _iterator.MoveForward();
+                        }
                     }
+                    else
+                    {
+                        var processed = ProcessSingleOperationCall();
+                        if (!processed)
+                        {
+                            _iterator.MoveForward();
+                        }
+                    }
+                    
                 }
                 else
                 {
                     _iterator.MoveForward();
                 }
             }
+            
+            var temp = _groups.Select(x => $"{x.FirstOperand.Value}, {x.Operation.Value}, {x.SecondOperand.Value}");
 
             return _groups;
+        }
+
+        private bool IsOperation(Token token)
+        {
+            return token.Type == TokenType.Division
+                   || token.Type == TokenType.Minus
+                   || token.Type == TokenType.Multiply
+                   || token.Type == TokenType.Plus;
         }
 
         private bool IsValidForProcess()
@@ -78,7 +123,7 @@ namespace Lab2.Tree
             return CreateSingleOperationCall(startIndex, singleCallList);
         }
 
-        private bool CreateSingleOperationCall(int startIndex, List<Token> groupTokens)
+        private bool CreateSingleOperationCall(int startIndex, List<Token> groupTokens, int? count = null)
         {
             var layer = _iterator.Iteration;
             var group = new SingleOperationCallDto($"[{_groups.Count}]", startIndex, layer, groupTokens);
@@ -89,27 +134,30 @@ namespace Lab2.Tree
                 return false;
             }
 
+            _previous = group;
             _groups.Add(group);
-            ReplaceWithToken(group);
+            ReplaceWithToken(group, count);
 
             return true;
         }
 
-        private void ReplaceWithToken(SingleOperationCallDto singleOperationCallDto)
+        private void ReplaceWithToken(SingleOperationCallDto singleOperationCallDto, int? count = null)
         {
-            var token = new Token(singleOperationCallDto.Name, TokenType.SingleOperationCall, 0);
+            var countToDeelte = count ?? singleOperationCallDto.Size;
 
-            _iterator.ChangeCollection(tokens => tokens.RemoveRange(singleOperationCallDto.BeginIndex, singleOperationCallDto.Size));
+            var token = new Token(singleOperationCallDto.Name, TokenType.SingleOperationCall, 0);
+            
+            _iterator.ChangeCollection(tokens => tokens.RemoveRange(singleOperationCallDto.BeginIndex, countToDeelte));
             _iterator.ChangeCollection(tokens => tokens.Insert(singleOperationCallDto.BeginIndex, token));
         }
 
-        private bool IsCorrectSingleOperationCall(SingleOperationCallDto singleOperationCallDto)
+        private bool IsCorrectSingleOperationCall(SingleOperationCallDto group)
         {
-            var higherPriority = singleOperationCallDto.Operation.Priority >= _iterator.CurrentElement.Priority ||
-                                 singleOperationCallDto.Size is 5 || _iterator.CurrentElement.Type is TokenType.RBrace;
+            var higherPriority = group.Operation.Priority >= _iterator.CurrentElement.Priority ||
+                                 group.Size is 5 || _iterator.CurrentElement.Type is TokenType.RBrace;
 
-            var correctOperrads = singleOperationCallDto.FirstOperand.Type is not TokenType.RBrace &&
-                                  singleOperationCallDto.SecondOperand.Type is not TokenType.LBrace;
+            var correctOperrads = group.FirstOperand.Type is not TokenType.RBrace &&
+                                  group.SecondOperand.Type is not TokenType.LBrace;
 
             return higherPriority && correctOperrads;
         }

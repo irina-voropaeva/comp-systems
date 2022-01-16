@@ -11,7 +11,7 @@ namespace Lab2.Tree
 
             while (showInput)
             {
-                var expression = "a+b*c/d-i+5*g*(o+p)";
+                var expression = "a+b*c/d+s*(l-e)";
 
                 var tokenizer = new Tokenizer(expression);
 

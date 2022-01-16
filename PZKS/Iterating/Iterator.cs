@@ -22,10 +22,10 @@ namespace Core.Iterating
         public bool MoveNext => CurrentIndex < CollectionLength;
         public bool CollectionEnd => CurrentIndex == CollectionLength;
         public int CollectionLength => _list.Count - 1;
-        public TIterable CurrentElement { get; private set; }
-        public TIterable NextElement { get; private set; }
-        public int CurrentIndex { get; private set; }
-        public int Iteration { get; private set; }
+        public TIterable CurrentElement { get; set; }
+        public TIterable NextElement { get; set; }
+        public int CurrentIndex { get; set; }
+        public int Iteration { get; set; }
 
         private readonly List<TIterable> _list;
         private readonly IterationOptions iterationOption;
