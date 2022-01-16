@@ -32,9 +32,9 @@ namespace Lab2.Tree
                 var isCurrentOperationPrioritied = IsOperation(_iterator.CurrentElement) &&
                                                 _previous?.Operation.Priority >= _iterator.CurrentElement.Priority;
 
-                var nextNextToken_pos2 = _iterator.LookAt(2, Direction.Forward);
+                var nextNextTokenPos2 = _iterator.LookAt(2, Direction.Forward);
 
-                var isNextOperationPrioritied = nextNextToken_pos2 != null && IsOperation(nextNextToken_pos2) && nextNextToken_pos2.Priority >= _iterator.CurrentElement.Priority;
+                var isNextOperationPrioritied = nextNextTokenPos2 != null && IsOperation(nextNextTokenPos2) && nextNextTokenPos2.Priority >= _iterator.CurrentElement.Priority;
 
                 if (IsValidForProcess() || (isCurrentOperationPrioritied && !isNextOperationPrioritied))
                 {
