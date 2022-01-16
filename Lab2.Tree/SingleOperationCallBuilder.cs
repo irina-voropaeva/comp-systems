@@ -29,7 +29,14 @@ namespace Lab2.Tree
         {
             while (!IsLast()) //[1] = [0]/d; add([1]-i)
             {
-                if (IsValidForProcess() || (IsOperation(_iterator.CurrentElement) && _previous?.Operation.Priority >= _iterator.CurrentElement.Priority))
+                var isCurrentOperationPrioritied = IsOperation(_iterator.CurrentElement) &&
+                                                _previous?.Operation.Priority >= _iterator.CurrentElement.Priority;
+
+                var nextNextToken_pos2 = _iterator.LookAt(2, Direction.Forward);
+
+                var isNextOperationPrioritied = nextNextToken_pos2 != null && IsOperation(nextNextToken_pos2) && nextNextToken_pos2.Priority >= _iterator.CurrentElement.Priority;
+
+                if (IsValidForProcess() || (isCurrentOperationPrioritied && !isNextOperationPrioritied))
                 {
                     if ((IsOperation(_iterator.CurrentElement) && _previous?.Operation.Priority >= _iterator.CurrentElement.Priority))
                     {
@@ -68,7 +75,11 @@ namespace Lab2.Tree
                         }
                     }
                     
-                }
+                } 
+                //else if ()
+                //{
+
+                //}
                 else
                 {
                     _iterator.MoveForward();
