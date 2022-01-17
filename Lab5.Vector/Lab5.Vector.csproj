@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="t\**" />
+    <EmbeddedResource Remove="t\**" />
+    <None Remove="t\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lab2.Tree\Lab2.Tree.csproj" />
+  </ItemGroup>
+
+</Project>

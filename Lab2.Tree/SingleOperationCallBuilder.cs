@@ -91,7 +91,7 @@ namespace Lab2.Tree
             return _groups;
         }
 
-        private bool IsOperation(Token token)
+        public bool IsOperation(Token token)
         {
             return token.Type == TokenType.Division
                    || token.Type == TokenType.Minus

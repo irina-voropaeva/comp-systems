@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab1.AlgebraicSyntaxAnalyze
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab2.Tree", "Lab2.Tree\Lab2.Tree.csproj", "{177E9ADA-9F4B-451A-9893-87AAC59942AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab5.Vector", "Lab5.Vector\Lab5.Vector.csproj", "{1714E8B3-FDB1-49D0-9093-0A0E63C0AC24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{177E9ADA-9F4B-451A-9893-87AAC59942AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{177E9ADA-9F4B-451A-9893-87AAC59942AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{177E9ADA-9F4B-451A-9893-87AAC59942AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1714E8B3-FDB1-49D0-9093-0A0E63C0AC24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1714E8B3-FDB1-49D0-9093-0A0E63C0AC24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1714E8B3-FDB1-49D0-9093-0A0E63C0AC24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1714E8B3-FDB1-49D0-9093-0A0E63C0AC24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
