@@ -13,7 +13,7 @@ namespace Lab5.Vector
 
             while (showInput)
             {
-                var expression = "b/2*a+4*8-(3-4+x*y*3)";
+                var expression = "a+b*c/d-i+5*g*(o+p+q+r)";
                     //"b/2*a+4*8-(3-4+x*y*3)";
 
                 var tokenizer = new Tokenizer(expression);
@@ -37,7 +37,9 @@ namespace Lab5.Vector
 
                 Console.WriteLine("");
 
-                Console.WriteLine("Available: 2*; 2+; 1/");
+                Console.WriteLine("------------------------------------------------------");
+
+                Console.WriteLine("Available cores: 2*; 2+; 1/");
 
                 Console.WriteLine("");
 
@@ -47,16 +49,22 @@ namespace Lab5.Vector
 
                 var orderedGroups = parallelizer.GetOrderedSubGroups(singleOperationCallDtos);
 
+                Console.WriteLine("------------------------------------------------------");
+
                 Console.WriteLine("Ordered sub-groups for parallelizing are:");
                 Console.WriteLine();
 
                 vectorPrinter.PrintOrderedSubGroups(orderedGroups);
+
+                Console.WriteLine("------------------------------------------------------");
 
                 Console.WriteLine("Subgroups can be parallelized between defined cores by the following flow:");
                 Console.WriteLine();
                 var result = parallelizer.ParallelizeBetweenCores(orderedGroups);
 
                 vectorPrinter.PrintParallelOperations(result);
+
+                Console.WriteLine("------------------------------------------------------");
 
                 vectorPrinter.PrintAllCoresStatuses(result);
 

@@ -14,8 +14,8 @@ namespace Lab5.Vector.Paralellizing
                 foreach (var parallelOperation in parallelLevel)
                 {
                     Console.WriteLine(
-                        $"{parallelOperation.Core.CoreName}; " +
                         $"Layer: {parallelOperation.Layer}; " +
+                        $"{parallelOperation.Core.CoreName}; " +
                         $"Operation total number: {parallelOperation.OperationNumber}; " +
                         $"Operation: {parallelOperation.Operation.Name} = {parallelOperation.Operation.FirstOperand.Value} " +
                         $"{parallelOperation.Operation.Operation.Value} " +
@@ -31,6 +31,9 @@ namespace Lab5.Vector.Paralellizing
 
         public void PrintAllCoresStatuses(List<List<ParallelOperation>> parallelOperations)
         {
+            Console.WriteLine("Core loading step by step: ");
+            Console.WriteLine();
+
             foreach (var parallelLevel in parallelOperations)
             {
                 foreach (var parallelOperation in parallelLevel)
@@ -41,10 +44,36 @@ namespace Lab5.Vector.Paralellizing
                             $"{coreStatus.CoreName}: {coreStatus.CurrentWork?.Name ?? "---" }; ");
                     }
 
-                    if (parallelOperation.OtherCoresStatus.Any())
-                    {
-                        Console.WriteLine();
-                    }
+                    Console.WriteLine();
+                }
+
+                if (parallelLevel.Any())
+                {
+                    Console.WriteLine();
+                }
+            }
+
+            Console.WriteLine("------------------------------------------------------");
+
+            Console.WriteLine("Core loading by layers: ");
+
+            Console.WriteLine("");
+
+            foreach (var parallelLevel in parallelOperations)
+            {
+                if (!parallelLevel.Any())
+                {
+                    continue;
+                }
+
+                var parallelOperation = parallelLevel.Last();
+                Console.Write($"Layer {parallelOperation.Layer}: ");
+
+
+                foreach (var coreStatus in parallelOperation.OtherCoresStatus)
+                {
+                    Console.Write(
+                        $"{coreStatus.CoreName}: {coreStatus.CurrentWork?.Name ?? "---" }; ");
                 }
 
                 if (parallelLevel.Any())
