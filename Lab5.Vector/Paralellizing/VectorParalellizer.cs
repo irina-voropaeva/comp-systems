@@ -33,13 +33,21 @@ namespace Lab5.Vector.Paralellizing
             };
 
             //calculate simple group, all operands are known 
-            var parallelizePartialResult = new ParallelizePartialResult()
+            var layerPosition = new LayerOperationNumber()
             {
-                J = 0,
+                OperationNumber = 0,
                 Layer = 1
             };
 
-            ParallelizeSimpleCalls(orderedGroups, parallellOperationsList, parallelizePartialResult);
+            var parallelizePartialResult = new ParallelizePartialResult()
+            {
+                LayerWithPostion = new Dictionary<int, int>()
+                {
+                    { layerPosition.Layer, layerPosition.OperationNumber }
+                }
+            };
+
+            ParallelizeCalls(orderedGroups, parallellOperationsList, parallelizePartialResult, layerPosition);
 
             return parallellOperationsList;
         }
@@ -71,16 +79,22 @@ namespace Lab5.Vector.Paralellizing
             return result;
         }
 
-        private  void ParallelizeSimpleCalls(List<List<SingleOperationCallDto>> orderedGroups, List<List<ParallelOperation>> parallellOperationsList, ParallelizePartialResult parallelizePartialResult)
+        private  void ParallelizeCalls(
+            List<List<SingleOperationCallDto>> orderedGroups, 
+            List<List<ParallelOperation>> parallellOperationsList, 
+            ParallelizePartialResult parallelizePartialResult,
+            LayerOperationNumber layerOperationNumber)
         {
             while (orderedGroups[0].Any())
             {
                 var availableCore = _availableCores.FirstOrDefault(ac =>
                     !ac.IsBusy && ac.AvailableOperations.Contains(orderedGroups[0][0].Operation.Value));
 
-                if (availableCore == null)
+                if (availableCore == null) // no available core for this operation, need to continue on layer 2
                 {
-                    parallelizePartialResult.Layer++; // no available core for this operation, need to continue on layer 2
+                    layerOperationNumber.Layer++;
+
+                    parallelizePartialResult.LayerWithPostion.Add(layerOperationNumber.Layer, layerOperationNumber.OperationNumber);
 
                     _availableCores.ForEach(ac => ac.IsBusy = false);
 
@@ -91,25 +105,30 @@ namespace Lab5.Vector.Paralellizing
 
                 var parallelOperation = new ParallelOperation(
                                                     availableCore, 
-                                                    orderedGroups[0][0], 
-                                                    parallelizePartialResult.Layer, 
-                                                    parallelizePartialResult.J, 
+                                                    orderedGroups[0][0],
+                                                    layerOperationNumber.Layer,
+                                                    layerOperationNumber.OperationNumber, 
                                                     _availableCores);
 
                 orderedGroups[0].RemoveAt(0);
 
-                parallellOperationsList[parallelizePartialResult.Layer - 1].Add(parallelOperation);
+                parallellOperationsList[layerOperationNumber.Layer - 1].Add(parallelOperation);
 
                 availableCore.IsBusy = true;
 
-                parallelizePartialResult.J++;
+                layerOperationNumber.OperationNumber++;
             }
         }
     }
 
     public class ParallelizePartialResult 
     {
+        public Dictionary<int, int> LayerWithPostion { get; set; }
+    }
+
+    public class LayerOperationNumber
+    {
         public int Layer { get; set; }
-        public int J { get; set; }
+        public int OperationNumber { get; set; }
     }
 }

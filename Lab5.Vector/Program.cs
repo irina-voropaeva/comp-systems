@@ -13,7 +13,7 @@ namespace Lab5.Vector
 
             while (showInput)
             {
-                var expression = "a*c*d*g*y*u*i*o";
+                var expression = "a+c+d+g+y+u+i+o";
                     //"b/2*a+4*8-(3-4+x*y*3)";
 
                 var tokenizer = new Tokenizer(expression);

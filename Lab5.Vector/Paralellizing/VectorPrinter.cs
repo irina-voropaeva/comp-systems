@@ -19,7 +19,7 @@ namespace Lab5.Vector.Paralellizing
                         $"{parallelOperation.Operation.SecondOperand.Value}; " +
                         $"Core: {parallelOperation.Core.CoreName}; " +
                         $"Layer: {parallelOperation.Layer}; " +
-                        $"Number: {parallelOperation.OperationNumber}");
+                        $"Operation total number: {parallelOperation.OperationNumber}");
                 }
 
                 if (parallelLevel.Any())

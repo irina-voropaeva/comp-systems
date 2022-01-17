@@ -14,7 +14,7 @@ namespace Lab5.Vector.Paralellizing
 
         public int CoreId { get; set; }
 
-        public string CoreName => $"{CoreId} : {string.Join(',', AvailableOperations.ToArray())}";
+        public string CoreName => $"{CoreId} with operations {string.Join(',', AvailableOperations.ToArray())}";
 
         public ProcessorCore(List<string> availableOperations, int coreId, bool isBusy = false)
         {
