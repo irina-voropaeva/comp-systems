@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lab2.Tree;
 
 namespace Lab5.Vector.Paralellizing
 {
@@ -8,6 +9,8 @@ namespace Lab5.Vector.Paralellizing
         public List<string> AvailableOperations { get; set; }
 
         public bool IsBusy { get; set; }
+
+        public SingleOperationCallDto CurrentWork { get; set; }
 
         public int CoreId { get; set; }
 

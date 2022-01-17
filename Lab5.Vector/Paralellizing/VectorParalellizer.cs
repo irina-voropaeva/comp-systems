@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Lab2.Tree;
 using Lab2.Tree.Tokens;
 
@@ -30,36 +32,14 @@ namespace Lab5.Vector.Paralellizing
                 new List<ParallelOperation>()
             };
 
-            //first layer, all operands are known 
-            var j = 0;
-            var layer = 1;
-
-            while(orderedGroups[0].Any())
+            //calculate simple group, all operands are known 
+            var parallelizePartialResult = new ParallelizePartialResult()
             {
-                var availableCore = _availableCores.FirstOrDefault(ac =>
-                    !ac.IsBusy && ac.AvailableOperations.Contains(orderedGroups[0][0].Operation.Value));
+                J = 0,
+                Layer = 1
+            };
 
-                if (availableCore == null)
-                {
-                    layer++; // no available core for this operation, need to continue on layer 2
-
-                    _availableCores.ForEach(ac => ac.IsBusy = false);
-
-                    parallellOperationsList.Add(new List<ParallelOperation>());
-                    continue;
-                }
-
-                var parallelOperation = new ParallelOperation(availableCore, orderedGroups[0][0], layer, j);
-
-                orderedGroups[0].RemoveAt(0);
-
-                parallellOperationsList[layer - 1].Add(parallelOperation);
-
-                availableCore.IsBusy = true;
-
-                j++;
-            }
-
+            ParallelizeSimpleCalls(orderedGroups, parallellOperationsList, parallelizePartialResult);
 
             return parallellOperationsList;
         }
@@ -90,5 +70,46 @@ namespace Lab5.Vector.Paralellizing
 
             return result;
         }
+
+        private  void ParallelizeSimpleCalls(List<List<SingleOperationCallDto>> orderedGroups, List<List<ParallelOperation>> parallellOperationsList, ParallelizePartialResult parallelizePartialResult)
+        {
+            while (orderedGroups[0].Any())
+            {
+                var availableCore = _availableCores.FirstOrDefault(ac =>
+                    !ac.IsBusy && ac.AvailableOperations.Contains(orderedGroups[0][0].Operation.Value));
+
+                if (availableCore == null)
+                {
+                    parallelizePartialResult.Layer++; // no available core for this operation, need to continue on layer 2
+
+                    _availableCores.ForEach(ac => ac.IsBusy = false);
+
+                    parallellOperationsList.Add(new List<ParallelOperation>());
+
+                    continue;
+                }
+
+                var parallelOperation = new ParallelOperation(
+                                                    availableCore, 
+                                                    orderedGroups[0][0], 
+                                                    parallelizePartialResult.Layer, 
+                                                    parallelizePartialResult.J, 
+                                                    _availableCores);
+
+                orderedGroups[0].RemoveAt(0);
+
+                parallellOperationsList[parallelizePartialResult.Layer - 1].Add(parallelOperation);
+
+                availableCore.IsBusy = true;
+
+                parallelizePartialResult.J++;
+            }
+        }
+    }
+
+    public class ParallelizePartialResult 
+    {
+        public int Layer { get; set; }
+        public int J { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Lab2.Tree;
+﻿using System.Collections.Generic;
+using Lab2.Tree;
 
 namespace Lab5.Vector.Paralellizing
 {
@@ -12,12 +13,15 @@ namespace Lab5.Vector.Paralellizing
 
         public int OperationNumber { get; set; }
 
-        public ParallelOperation(ProcessorCore core, SingleOperationCallDto operation, int layer, int operationNumber)
+        public List<ProcessorCore> OtherCoresStatus { get; set; }
+
+        public ParallelOperation(ProcessorCore core, SingleOperationCallDto operation, int layer, int operationNumber, List<ProcessorCore> otherCoresStatus)
         {
             Core = core;
             Operation = operation;
             Layer = layer;
             OperationNumber = operationNumber;
+            OtherCoresStatus = otherCoresStatus;
         }
     }
 }

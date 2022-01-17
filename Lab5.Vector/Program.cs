@@ -42,14 +42,21 @@ namespace Lab5.Vector
                 Console.WriteLine("");
 
                 var parallelizer = new VectorParalellizer();
+                var vectorPrinter = new VectorPrinter();
+
 
                 var orderedGroups = parallelizer.GetOrderedSubGroups(singleOperationCallDtos);
 
+                Console.WriteLine("Ordered sub-groups for parallelizing are:");
+                Console.WriteLine();
+
+                vectorPrinter.PrintOrderedSubGroups(orderedGroups);
+
+                Console.WriteLine("Subgroups can be parallelized between defined cores by the following flow:");
+                Console.WriteLine();
                 var result = parallelizer.ParallelizeBetweenCores(orderedGroups);
 
-                var vectorPrinter = new VectorPrinter();
-
-                vectorPrinter.Print(result);
+                vectorPrinter.PrintParallelOperations(result);
 
                 Console.ReadKey();
             }
