@@ -14,12 +14,37 @@ namespace Lab5.Vector.Paralellizing
                 foreach (var parallelOperation in parallelLevel)
                 {
                     Console.WriteLine(
-                        $"{parallelOperation.Operation.Name} = {parallelOperation.Operation.FirstOperand.Value} " +
-                        $"{parallelOperation.Operation.Operation.Value} " +
-                        $"{parallelOperation.Operation.SecondOperand.Value}; " +
-                        $"Core: {parallelOperation.Core.CoreName}; " +
+                        $"{parallelOperation.Core.CoreName}; " +
                         $"Layer: {parallelOperation.Layer}; " +
-                        $"Operation total number: {parallelOperation.OperationNumber}");
+                        $"Operation total number: {parallelOperation.OperationNumber}; " +
+                        $"Operation: {parallelOperation.Operation.Name} = {parallelOperation.Operation.FirstOperand.Value} " +
+                        $"{parallelOperation.Operation.Operation.Value} " +
+                        $"{parallelOperation.Operation.SecondOperand.Value}; ");
+                }
+
+                if (parallelLevel.Any())
+                {
+                    Console.WriteLine();
+                }
+            }
+        }
+
+        public void PrintAllCoresStatuses(List<List<ParallelOperation>> parallelOperations)
+        {
+            foreach (var parallelLevel in parallelOperations)
+            {
+                foreach (var parallelOperation in parallelLevel)
+                {
+                    foreach (var coreStatus in parallelOperation.OtherCoresStatus)
+                    {
+                        Console.Write(
+                            $"{coreStatus.CoreName}: {coreStatus.CurrentWork?.Name ?? "---" }; ");
+                    }
+
+                    if (parallelOperation.OtherCoresStatus.Any())
+                    {
+                        Console.WriteLine();
+                    }
                 }
 
                 if (parallelLevel.Any())

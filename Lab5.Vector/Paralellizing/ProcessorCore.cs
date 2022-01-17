@@ -14,13 +14,14 @@ namespace Lab5.Vector.Paralellizing
 
         public int CoreId { get; set; }
 
-        public string CoreName => $"{CoreId} with operations {string.Join(',', AvailableOperations.ToArray())}";
+        public string CoreName => $"Core {CoreId}: {string.Join(',', AvailableOperations.ToArray())}";
 
-        public ProcessorCore(List<string> availableOperations, int coreId, bool isBusy = false)
+        public ProcessorCore(List<string> availableOperations, int coreId, bool isBusy = false, SingleOperationCallDto currentWork = null)
         {
             AvailableOperations = availableOperations;
             IsBusy = isBusy;
             CoreId = coreId;
+            CurrentWork = currentWork;
         }
     }
 }

@@ -75,11 +75,7 @@ namespace Lab2.Tree
                         }
                     }
                     
-                } 
-                //else if ()
-                //{
-
-                //}
+                }
                 else
                 {
                     _iterator.MoveForward();

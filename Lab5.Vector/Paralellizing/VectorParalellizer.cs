@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Lab2.Tree;
 using Lab2.Tree.Tokens;
 
@@ -9,7 +7,7 @@ namespace Lab5.Vector.Paralellizing
 {
     public class VectorParalellizer
     {
-        private List<ProcessorCore> _availableCores = new List<ProcessorCore>()
+        private readonly List<ProcessorCore> _availableCores = new()
         {
             new ProcessorCore(new List<string>() { "+", "-" }, 1),
             new ProcessorCore(new List<string>() { "+", "-" }, 2),
@@ -18,20 +16,18 @@ namespace Lab5.Vector.Paralellizing
             new ProcessorCore(new List<string>() { "/" }, 5),
         };
 
-        private List<ParallelOperation> _parallelOperations;
+        private readonly List<List<ParallelOperation>> _parallelOperations;
 
         public VectorParalellizer()
         {
-            _parallelOperations = new List<ParallelOperation>();
+            _parallelOperations = new List<List<ParallelOperation>>()
+            {
+                new()
+            };
         }
 
         public List<List<ParallelOperation>> ParallelizeBetweenCores(List<List<SingleOperationCallDto>> orderedGroups)
         {
-            var parallellOperationsList = new List<List<ParallelOperation>>()
-            {
-                new List<ParallelOperation>()
-            };
-
             //calculate simple group, all operands are known 
             var layerPosition = new LayerOperationNumber()
             {
@@ -41,15 +37,15 @@ namespace Lab5.Vector.Paralellizing
 
             var parallelizePartialResult = new ParallelizePartialResult()
             {
-                LayerWithPostion = new Dictionary<int, int>()
+                LayerWithPosition = new Dictionary<int, int>()
                 {
                     { layerPosition.Layer, layerPosition.OperationNumber }
                 }
             };
 
-            ParallelizeCalls(orderedGroups, parallellOperationsList, parallelizePartialResult, layerPosition);
+            ParallelizeCalls(orderedGroups, parallelizePartialResult, layerPosition);
 
-            return parallellOperationsList;
+            return _parallelOperations;
         }
 
         public List<List<SingleOperationCallDto>> GetOrderedSubGroups(List<SingleOperationCallDto> groups)
@@ -81,49 +77,139 @@ namespace Lab5.Vector.Paralellizing
 
         private  void ParallelizeCalls(
             List<List<SingleOperationCallDto>> orderedGroups, 
-            List<List<ParallelOperation>> parallellOperationsList, 
             ParallelizePartialResult parallelizePartialResult,
             LayerOperationNumber layerOperationNumber)
         {
-            while (orderedGroups[0].Any())
+            while (orderedGroups[0].Any() || orderedGroups[1].Any() || orderedGroups[2].Any())
             {
-                var availableCore = _availableCores.FirstOrDefault(ac =>
-                    !ac.IsBusy && ac.AvailableOperations.Contains(orderedGroups[0][0].Operation.Value));
+                var flatCalculatedCallsList = _parallelOperations.SelectMany(pol => pol.Select(po => po.Operation.Name))
+                    .ToList();
 
-                if (availableCore == null) // no available core for this operation, need to continue on layer 2
+                if (orderedGroups[0].Any())
                 {
-                    layerOperationNumber.Layer++;
+                    var availableCore = GetAvailableCore(orderedGroups[0][0].Operation.Value);
 
-                    parallelizePartialResult.LayerWithPostion.Add(layerOperationNumber.Layer, layerOperationNumber.OperationNumber);
+                    if (availableCore == null) // no available core for this operation, need to continue on layer 2
+                    {
+                        GoToNextLayer(layerOperationNumber, parallelizePartialResult, _parallelOperations);
 
-                    _availableCores.ForEach(ac => ac.IsBusy = false);
+                        continue;
+                    }
 
-                    parallellOperationsList.Add(new List<ParallelOperation>());
+                    var parallelOperation = new ParallelOperation(
+                        availableCore,
+                        orderedGroups[0][0],
+                        layerOperationNumber.Layer,
+                        layerOperationNumber.OperationNumber,
+                        _availableCores);
 
-                    continue;
+                    _parallelOperations[layerOperationNumber.Layer - 1].Add(parallelOperation);
+
+                    availableCore.IsBusy = true;
+
+                    layerOperationNumber.OperationNumber++;
+
+                    orderedGroups[0].RemoveAt(0);
                 }
 
-                var parallelOperation = new ParallelOperation(
-                                                    availableCore, 
-                                                    orderedGroups[0][0],
-                                                    layerOperationNumber.Layer,
-                                                    layerOperationNumber.OperationNumber, 
-                                                    _availableCores);
+                if (orderedGroups[1].Any())
+                {
+                    // if possible, use available core for operation from 2 subgroup
+                    var callFromSubGroup1 = orderedGroups[1].SingleOrDefault(og =>
+                        flatCalculatedCallsList.Contains(og.FirstOperand.Value) && og.SecondOperand.Type == TokenType.Operand
+                        || flatCalculatedCallsList.Contains(og.SecondOperand.Value) && og.FirstOperand.Type == TokenType.Operand);
 
-                orderedGroups[0].RemoveAt(0);
+                    if (callFromSubGroup1 != null)
+                    {
+                        var availableCoreForSubgroup1 = GetAvailableCore(callFromSubGroup1.Operation.Value);
 
-                parallellOperationsList[layerOperationNumber.Layer - 1].Add(parallelOperation);
+                        if (availableCoreForSubgroup1 == null) // no available core for this operation, need to continue on layer 2
+                        {
+                            GoToNextLayer(layerOperationNumber, parallelizePartialResult, _parallelOperations);
 
-                availableCore.IsBusy = true;
+                            continue;
+                        }
 
-                layerOperationNumber.OperationNumber++;
+                        var parallelOperationSubGroup1 = new ParallelOperation(
+                            availableCoreForSubgroup1,
+                            callFromSubGroup1,
+                            layerOperationNumber.Layer,
+                            layerOperationNumber.OperationNumber,
+                            _availableCores);
+
+                        _parallelOperations[layerOperationNumber.Layer - 1].Add(parallelOperationSubGroup1);
+
+
+                        availableCoreForSubgroup1.IsBusy = true;
+
+                        layerOperationNumber.OperationNumber++;
+
+                        orderedGroups[1].RemoveAt(0);
+                    }
+                }
+
+                if (orderedGroups[2].Any())
+                {
+                    // if possible, use available core for operation from subgroup 3
+
+                    var callFromSubGroup2 = orderedGroups[2].SingleOrDefault(og => flatCalculatedCallsList.Contains(og.FirstOperand.Value)
+                        && flatCalculatedCallsList.Contains(og.SecondOperand.Value));
+
+                    if (callFromSubGroup2 != null)
+                    {
+                        var availableCoreForSubgroup2 = GetAvailableCore(callFromSubGroup2.Operation.Value);
+
+                        if (availableCoreForSubgroup2 == null) // no available core for this operation, need to continue on layer 2
+                        {
+                            GoToNextLayer(layerOperationNumber, parallelizePartialResult, _parallelOperations);
+
+                            continue;
+                        }
+
+                        
+                        var parallelOperationSubGroup2 = new ParallelOperation(
+                            availableCoreForSubgroup2,
+                            callFromSubGroup2,
+                            layerOperationNumber.Layer,
+                            layerOperationNumber.OperationNumber,
+                            _availableCores);
+
+                        _parallelOperations[layerOperationNumber.Layer - 1].Add(parallelOperationSubGroup2);
+
+                        availableCoreForSubgroup2.IsBusy = true;
+
+                        layerOperationNumber.OperationNumber++;
+
+                        orderedGroups[2].RemoveAt(0);
+                    }
+                }
             }
+        }
+
+        private void GoToNextLayer(
+            LayerOperationNumber layerOperationNumber, 
+            ParallelizePartialResult parallelizePartialResult, 
+            List<List<ParallelOperation>> parallellOperationsList)
+        {
+            layerOperationNumber.Layer++;
+
+            parallelizePartialResult.LayerWithPosition.Add(layerOperationNumber.Layer, layerOperationNumber.OperationNumber);
+
+            _availableCores.ForEach(ac => ac.IsBusy = false);
+
+            parallellOperationsList.Add(new List<ParallelOperation>());
+        }
+
+        private ProcessorCore GetAvailableCore(string value)
+        {
+            return _availableCores.FirstOrDefault(ac =>
+                !ac.IsBusy && ac.AvailableOperations.Contains(value));
         }
     }
 
     public class ParallelizePartialResult 
     {
-        public Dictionary<int, int> LayerWithPostion { get; set; }
+        public Dictionary<int, int> LayerWithPosition { get; set; }
     }
 
     public class LayerOperationNumber
